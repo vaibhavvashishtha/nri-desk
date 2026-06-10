@@ -45,6 +45,6 @@ app.get("/healthz", (_req, res) => res.json({ ok: true }));
 
 // Static assets + SPA fallback
 app.use(express.static(DIST, { maxAge: "1y", immutable: true, index: false }));
-app.get("*", (_req, res) => res.sendFile(path.join(DIST, "index.html")));
+app.use((_req, res) => res.sendFile(path.join(DIST, "index.html")));
 
 app.listen(PORT, () => console.log(`nri-desk listening on :${PORT}`));
