@@ -72,8 +72,13 @@ pm2 save
 pm2 startup systemd -u root --hp /root | tail -1 | bash || true
 
 echo "==> Configuring Nginx..."
-cp "$APP_DIR/deploy/nginx.conf" "/etc/nginx/sites-available/$DOMAIN"
-ln -sf "/etc/nginx/sites-available/$DOMAIN" "/etc/nginx/sites-enabled/$DOMAIN"
+if [ -d "/etc/letsencrypt/live/$DOMAIN" ]; then
+  echo "    Cert already exists for $DOMAIN — skipping nginx.conf overwrite to preserve certbot's SSL block."
+  echo "    To regenerate from scratch: rm /etc/nginx/sites-{available,enabled}/$DOMAIN, then rerun this script and re-run certbot."
+else
+  cp "$APP_DIR/deploy/nginx.conf" "/etc/nginx/sites-available/$DOMAIN"
+  ln -sf "/etc/nginx/sites-available/$DOMAIN" "/etc/nginx/sites-enabled/$DOMAIN"
+fi
 nginx -t && systemctl reload nginx
 
 echo ""
